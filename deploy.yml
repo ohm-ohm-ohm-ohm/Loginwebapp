@@ -1,0 +1,21 @@
+---
+- name: Deploy Dockerized Java app to SIT
+  hosts: sit
+  become: true
+  tasks:
+
+    - name: Copy Docker image to SIT machine
+      copy:
+        src: loginwebapp.tar
+        dest: /home/ubuntu/loginwebapp.tar
+        mode: '0644'
+
+    - name: Load Docker image
+      command: docker load < /home/ubuntu/loginwebapp.tar
+
+    - name: Remove existing container if exists
+      command: docker rm -f loginwebapp
+      ignore_errors: yes
+
+    - name: Run container
+      command: docker run -d --name loginwebapp -p 8080:8080 loginwebapp:latest
